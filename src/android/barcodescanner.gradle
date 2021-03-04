@@ -14,4 +14,10 @@ android {
         exclude 'META-INF/NOTICE'
         exclude 'META-INF/LICENSE'
     }
+    
+    configurations {
+        all {
+            exclude group: "com.google.zxing", module: "core"
+        }
+    }
 }
