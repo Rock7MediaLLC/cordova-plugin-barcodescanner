@@ -42,6 +42,8 @@
 - (void)returnImage:(NSString*)filePath format:(NSString*)format callback:(NSString*)callback;
 - (void)returnSuccess:(NSString*)scannedText format:(NSString*)format cancelled:(BOOL)cancelled flipped:(BOOL)flipped callback:(NSString*)callback;
 - (void)returnError:(NSString*)message callback:(NSString*)callback;
+- (void)isCameraGranted:(CDVInvokedUrlCommand *)command;
+- (void)requestCameraPermission:(CDVInvokedUrlCommand *)command;
 @end
 
 //------------------------------------------------------------------------------
@@ -273,6 +275,25 @@
                                ];
 
     [self.commandDelegate sendPluginResult:result callbackId:callback];
+}
+
+- (void)isCameraGranted:(CDVInvokedUrlCommand *)command {
+    BOOL enabled = ([AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo] == AVAuthorizationStatusAuthorized);
+
+    [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                                messageAsInt:(enabled) ? 1 : 0]
+                                callbackId:command.callbackId];
+}
+
+-(void)requestCameraPermission:(CDVInvokedUrlCommand *)command {
+
+    [AVCaptureDevice requestAccessForMediaType:AVMediaTypeVideo completionHandler:^(BOOL granted) {
+        // iOS store this information and only ask once, after that you have to enable the Camera Permission in the phone settings
+            [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                                messageAsInt:(granted) ? 1 : 0]
+                                callbackId:command.callbackId];
+
+    }];
 }
 
 @end

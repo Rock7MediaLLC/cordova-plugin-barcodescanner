@@ -152,5 +152,43 @@ BarcodeScanner.prototype.scan = function (successCallback, errorCallback, config
             ]);
         };
 
+        BarcodeScanner.prototype.isCameraGranted = function (successCallback, errorCallback) {
+            if (errorCallback == null) {
+                errorCallback = function () {
+                };
+            }
+
+            if (typeof errorCallback != "function") {
+                console.log("BarcodeScanner.isCameraGranted failure: failure parameter not a function");
+                return;
+            }
+
+            if (typeof successCallback != "function") {
+                console.log("BarcodeScanner.isCameraGranted failure: success callback parameter must be a function");
+                return;
+            }
+
+            exec(successCallback, errorCallback, 'BarcodeScanner', 'isCameraGranted');
+        };
+
+        BarcodeScanner.prototype.requestPermission = function (successCallback, errorCallback) {
+            if (errorCallback == null) {
+                errorCallback = function () {
+                };
+            }
+
+            if (typeof errorCallback != "function") {
+                console.log("BarcodeScanner.isCameraGranted failure: failure parameter not a function");
+                return;
+            }
+
+            if (typeof successCallback != "function") {
+                console.log("BarcodeScanner.isCameraGranted failure: success callback parameter must be a function");
+                return;
+            }
+
+            exec(successCallback, errorCallback, 'BarcodeScanner', 'requestCameraPermission');
+        };
+
         var barcodeScanner = new BarcodeScanner();
         module.exports = barcodeScanner;

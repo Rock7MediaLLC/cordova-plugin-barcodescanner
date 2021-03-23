@@ -59,6 +59,8 @@ public class BarcodeScanner extends CordovaPlugin {
     private static final String SMS_TYPE = "SMS_TYPE";
 
     private static final String LOG_TAG = "BarcodeScanner";
+    private static final String IS_CAMERA_GRANTED = "isCameraGranted";
+    private static final String REQUEST_CAMERA_PERMISSION = "requestCameraPermission";
 
     private String [] permissions = { Manifest.permission.CAMERA };
 
@@ -121,6 +123,10 @@ public class BarcodeScanner extends CordovaPlugin {
             } else {
               scan(args);
             }
+        } else if (action.equals(IS_CAMERA_GRANTED)) {
+            isCameraGranted();
+        } else if (action.equals(REQUEST_CAMERA_PERMISSION)) {
+            requestCameraPermission();
         } else {
             return false;
         }
@@ -298,22 +304,36 @@ public class BarcodeScanner extends CordovaPlugin {
   public void onRequestPermissionResult(int requestCode, String[] permissions,
                                          int[] grantResults) throws JSONException
    {
-       PluginResult result;
-       for (int r : grantResults) {
-           if (r == PackageManager.PERMISSION_DENIED) {
-               Log.d(LOG_TAG, "Permission Denied!");
-               result = new PluginResult(PluginResult.Status.ILLEGAL_ACCESS_EXCEPTION);
-               this.callbackContext.sendPluginResult(result);
-               return;
-           }
-       }
 
-       switch(requestCode)
-       {
-           case 0:
-               scan(this.requestArgs);
-               break;
-       }
+        if(requestCode == 1) {
+
+            for (int r : grantResults) {
+                if (r == PackageManager.PERMISSION_GRANTED) {
+                    this.callbackContext.success(1);
+                    return;
+                }
+            }
+            this.callbackContext.success(0);
+            
+
+        } else {
+            PluginResult result;
+            for (int r : grantResults) {
+                if (r == PackageManager.PERMISSION_DENIED) {
+                    Log.d(LOG_TAG, "Permission Denied!");
+                    result = new PluginResult(PluginResult.Status.ILLEGAL_ACCESS_EXCEPTION);
+                    this.callbackContext.sendPluginResult(result);
+                    return;
+                }
+            }
+
+            switch(requestCode)
+            {
+                case 0:
+                    scan(this.requestArgs);
+                    break;
+            }
+        }
    }
 
     /**
@@ -323,6 +343,14 @@ public class BarcodeScanner extends CordovaPlugin {
      */
     public void onRestoreStateForActivityResult(Bundle state, CallbackContext callbackContext) {
         this.callbackContext = callbackContext;
+    }
+
+    public void isCameraGranted() {
+        this.callbackContext.success(hasPermisssion() ? 1:0);
+    }
+
+    public void requestCameraPermission() {
+        requestPermissions(1);
     }
 
 }
